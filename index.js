@@ -1,44 +1,33 @@
 const mineflayer = require('mineflayer');
+const http = require('http');
 
 function createBot() {
   const bot = mineflayer.createBot({
     host: '1deadsteal.aternos.me',
-    port: 45632,
+    port: 60929,
     username: 'mr_trolling',
   });
 
-  // Quiet mode
   bot.on('message', () => {});
   bot.on('chat', () => {});
+  bot.on('kicked', () => setTimeout(createBot, 5000));
+  bot.on('end', () => setTimeout(createBot, 5000));
 
-  // Auto reconnect
-  bot.on('kicked', () => {
-    setTimeout(createBot, 5000);
-  });
-  bot.on('end', () => {
-    setTimeout(createBot, 5000);
-  });
-
-  // Movement loop
   bot.on('spawn', () => {
     let forward = true;
-
     setInterval(() => {
       bot.clearControlStates();
-
-      if (forward) {
-        bot.setControlState('forward', true);
-      } else {
-        bot.setControlState('back', true);
-      }
-
-      // Jump to avoid getting stuck
-      bot.setControlState('jump', true);
-      setTimeout(() => bot.setControlState('jump', false), 300);
+      if (forward) bot.setControlState('forward', true);
+      else bot.setControlState('back', true);
 
       forward = !forward;
     }, 3000);
   });
 }
+
+// Tiny HTTP server to keep Render happy
+http.createServer((req, res) => {
+  res.end('Bot is running');
+}).listen(process.env.PORT || 3000);
 
 createBot();
