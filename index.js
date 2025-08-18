@@ -1,40 +1,50 @@
-const mineflayer = require("mineflayer")
-const http = require("http")
+// bot.js
+const mineflayer = require('mineflayer');
+const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
+const { GoalBlock } = goals;
 
-// === SETTINGS ===
-const BOT_HOST = "1deadsteal.aternos.me"
-const BOT_PORT = 60929     // update if Aternos gives a new one
-const BOT_NAME = "mr_trolling"
-
-// === BOT CREATION ===
-function startBot() {
+function createBot() {
   const bot = mineflayer.createBot({
-    host: BOT_HOST,
-    port: BOT_PORT,
-    username: BOT_NAME,
-    version: "1.20"   // force Minecraft 1.20
-  })
+    host: '1deadsteal.aternos.me',
+    port: 60929,
+    username: 'mr_trolling',
+    version: '1.20.4' // change this to your server's exact version if different
+  });
 
-  bot.once("spawn", async () => {
-    try {
-      bot.setControlState("forward", true)
-      await new Promise(r => setTimeout(r, 2000))
-      bot.setControlState("forward", false)
+  bot.loadPlugin(pathfinder);
 
-      bot.setControlState("back", true)
-      await new Promise(r => setTimeout(r, 2000))
-      bot.setControlState("back", false)
-    } catch {}
-  })
+  bot.on('spawn', () => {
+    const mcData = require('minecraft-data')(bot.version);
+    const defaultMove = new Movements(bot, mcData);
 
-  bot.on("end", () => setTimeout(startBot, 5000))
-  bot.on("kicked", () => setTimeout(startBot, 5000))
-  bot.on("error", () => {})
+    // Save spawn point
+    const spawn = bot.entity.position.clone().floor();
+
+    async function walkLoop() {
+      try {
+        // Walk 2 blocks forward (X + 2, you can change axis if needed)
+        const forward = spawn.offset(2, 0, 0);
+        await bot.pathfinder.goto(new GoalBlock(forward.x, forward.y, forward.z));
+
+        // Walk back to spawn
+        await bot.pathfinder.goto(new GoalBlock(spawn.x, spawn.y, spawn.z));
+
+        setTimeout(walkLoop, 500); // repeat
+      } catch (err) {
+        setTimeout(walkLoop, 2000); // retry if error
+      }
+    }
+
+    bot.pathfinder.setMovements(defaultMove);
+    walkLoop();
+  });
+
+  bot.on('kicked', () => setTimeout(createBot, 5000));
+  bot.on('end', () => setTimeout(createBot, 5000));
+
+  // Silence logs
+  bot.on('message', () => {});
+  bot.on('chat', () => {});
 }
 
-startBot()
-
-// === KEEP-ALIVE SERVER ===
-const PORT = process.env.PORT || 3000
-http.createServer((req, res) => res.end("alive")).listen(PORT)
-
+createBot();
