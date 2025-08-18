@@ -1,11 +1,17 @@
 {
   "name": "mc-bot",
   "version": "1.0.0",
-  "main": "bot.js",
+  "description": "Minecraft bot for Aternos",
+  "main": "index.js",
   "dependencies": {
-    "mineflayer": "^4.16.0"
+    "mineflayer": "^4.16.0",
+    "mineflayer-pathfinder": "^2.5.0",
+    "minecraft-data": "^3.80.0"
   },
   "scripts": {
-    "start": "node bot.js"
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
