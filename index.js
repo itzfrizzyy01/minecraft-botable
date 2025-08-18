@@ -3,7 +3,7 @@ const http = require("http")
 
 // === SETTINGS ===
 const BOT_HOST = "1deadsteal.aternos.me"
-const BOT_PORT = 45632     // update if Aternos gives a new one
+const BOT_PORT = 60929     // update if Aternos gives a new one
 const BOT_NAME = "mr_trolling"
 
 // === BOT CREATION ===
@@ -37,3 +37,4 @@ startBot()
 // === KEEP-ALIVE SERVER ===
 const PORT = process.env.PORT || 3000
 http.createServer((req, res) => res.end("alive")).listen(PORT)
+
