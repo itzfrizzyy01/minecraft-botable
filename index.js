@@ -1,64 +1,48 @@
-const mineflayer = require('mineflayer')
-const http = require('http')
+const mineflayer = require("mineflayer")
+const http = require("http")
 
-function createBot() {
+// === SETTINGS ===
+const BOT_HOST = "1deadsteal.aternos.me"
+const BOT_PORT = 45632   // ⚠️ update this if Aternos gives a new one
+const BOT_NAME = "mr_trolling"
+
+// === BOT CREATION ===
+function startBot() {
   const bot = mineflayer.createBot({
-    host: "1deadsteal.aternos.me", // Aternos IP
-    port: 45632,                   // check port each time you start server!
-    username: "mr_trolling"        // bot name (cracked server)
-    // If your server is online-mode = true, use:
-    // username: "your_email",
-    // password: "your_password",
-    // auth: "microsoft"
+    host: BOT_HOST,
+    port: BOT_PORT,
+    username: BOT_NAME,
   })
 
-  // === Movement ===
-  bot.on('spawn', async () => {
-    console.log("✅ Bot spawned in server")
-    setInterval(async () => {
-      try {
-        bot.setControlState('forward', true)
-        await bot.waitForTicks(20) // move ~1 sec
-        bot.setControlState('forward', false)
+  bot.once("login", () => console.log("✅ Logged in, waiting for spawn..."))
+  bot.once("spawn", async () => {
+    console.log("🎮 Spawned in game")
+    try {
+      bot.setControlState("forward", true)
+      await new Promise(r => setTimeout(r, 2000)) // walk 2s forward
+      bot.setControlState("forward", false)
 
-        bot.setControlState('back', true)
-        await bot.waitForTicks(20)
-        bot.setControlState('back', false)
-      } catch {}
-    }, 5000)
+      bot.setControlState("back", true)
+      await new Promise(r => setTimeout(r, 2000)) // walk back
+      bot.setControlState("back", false)
+
+      console.log("↔️ Movement done, idle at spawn")
+    } catch (e) {
+      console.log("⚠️ Movement error:", e.message)
+    }
   })
 
-  // === Auto Respawn ===
-  bot.on('death', () => {
-    console.log("☠️ Bot died, respawning...")
-    bot.respawn()
+  bot.on("end", () => {
+    console.log("🔁 Disconnected. Reconnecting in 5s...")
+    setTimeout(startBot, 5000)
   })
 
-  // === Auto Reconnect ===
-  bot.on('end', () => {
-    console.log("🔄 Disconnected, retrying in 5s...")
-    setTimeout(createBot, 5000)
-  })
-
-  // === Minimal Debug Logs ===
-  bot.on('login', () => console.log("🔐 Logged in, waiting to spawn..."))
-  bot.on('kicked', (reason) => console.log("⛔ Kicked:", reason))
-  bot.on('error', (err) => console.log("⚠️ Error:", err.message))
+  bot.on("kicked", reason => console.log("⛔ Kicked:", reason))
+  bot.on("error", err => console.log("⚠️ Error:", err.message))
 }
 
-// === Keep-Alive HTTP Server (Render) ===
+startBot()
+
+// === KEEP-ALIVE SERVER ===
 const PORT = process.env.PORT || 3000
-http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' })
-  res.end('Bot is alive\n')
-}).listen(PORT, () => {
-  console.log(`🌐 Keep-alive server running on port ${PORT}`)
-})
-
-// === Self-Ping Every 5 Minutes ===
-setInterval(() => {
-  http.get(`http://localhost:${PORT}`)
-}, 5 * 60 * 1000)
-
-// === Start Bot ===
-createBot()
+http.createServer((req, res) => res.end("Bot alive")).listen(PORT)
