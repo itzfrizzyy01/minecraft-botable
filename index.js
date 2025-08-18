@@ -1,9 +1,9 @@
-\const mineflayer = require('mineflayer');
+const mineflayer = require('mineflayer');
 
 function createBot() {
   const bot = mineflayer.createBot({
     host: '1deadsteal.aternos.me',
-    port: 60929,
+    port: 45632,
     username: 'mr_trolling',
   });
 
