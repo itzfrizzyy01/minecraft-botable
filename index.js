@@ -1,63 +1,51 @@
-// bot.js
 const mineflayer = require('mineflayer');
-const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
-const { GoalBlock } = goals;
-
-function createBot() {
-  const bot = mineflayer.createBot({
-  // bot.js
-const mineflayer = require('mineflayer');
-const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
-const { GoalBlock } = goals;
 
 function createBot() {
   const bot = mineflayer.createBot({
     host: '1deadsteal.aternos.me',
-    port: 45632,
+    port: 60929,
     username: 'mr_trolling',
-    version: '1.21.1' // change this to your server's exact version if different
   });
 
-  bot.loadPlugin(pathfinder);
-
-  bot.on('spawn', () => {
-    const mcData = require('minecraft-data')(bot.version);
-    const defaultMove = new Movements(bot, mcData);
-
-    // Save spawn point
-    const spawn = bot.entity.position.clone().floor();
-
-    async function walkLoop() {
-      try {
-        // Walk 2 blocks forward (X + 2, you can change axis if needed)
-        const forward = spawn.offset(2, 0, 0);
-        await bot.pathfinder.goto(new GoalBlock(forward.x, forward.y, forward.z));
-
-        // Walk back to spawn
-        await bot.pathfinder.goto(new GoalBlock(spawn.x, spawn.y, spawn.z));
-
-        setTimeout(walkLoop, 500); // repeat
-      } catch (err) {
-        setTimeout(walkLoop, 2000); // retry if error
-      }
-    }
-
-    
-    bot.pathfinder.setMovements(defaultMove);
-    walkLoop();
-  });
-
-  bot.pathfinder.setMovements(defaultMove);
-    walkLoop();
-  });
-
-  bot.on('kicked', () => setTimeout(createBot, 5000));
-  bot.on('end', () => setTimeout(createBot, 5000));
-
-  // Silence logs
+  // Quiet mode
   bot.on('message', () => {});
   bot.on('chat', () => {});
+
+  // Auto reconnect
+  bot.on('kicked', () => {
+    console.log("Kicked, reconnecting...");
+    setTimeout(createBot, 5000);
+  });
+  bot.on('end', () => {
+    console.log("Disconnected, reconnecting...");
+    setTimeout(createBot, 5000);
+  });
+
+  // Movement loop
+  bot.on('spawn', () => {
+    console.log("Bot spawned, starting movement loop...");
+
+    let forward = true;
+
+    setInterval(() => {
+      // reset all keys first
+      bot.clearControlStates();
+
+      if (forward) {
+        console.log("Moving forward...");
+        bot.setControlState('forward', true);
+      } else {
+        console.log("Moving back...");
+        bot.setControlState('back', true);
+      }
+
+      // jump so it doesn’t get stuck
+      bot.setControlState('jump', true);
+      setTimeout(() => bot.setControlState('jump', false), 300);
+
+      forward = !forward;
+    }, 3000); // switch direction every 3 seconds
+  });
 }
 
 createBot();
-
