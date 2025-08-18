@@ -5,8 +5,15 @@ const { GoalBlock } = goals;
 
 function createBot() {
   const bot = mineflayer.createBot({
+  // bot.js
+const mineflayer = require('mineflayer');
+const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
+const { GoalBlock } = goals;
+
+function createBot() {
+  const bot = mineflayer.createBot({
     host: '1deadsteal.aternos.me',
-    port: 60929,
+    port: 45632,
     username: 'mr_trolling',
     version: '1.21.1' // change this to your server's exact version if different
   });
@@ -35,7 +42,12 @@ function createBot() {
       }
     }
 
+    
     bot.pathfinder.setMovements(defaultMove);
+    walkLoop();
+  });
+
+  bot.pathfinder.setMovements(defaultMove);
     walkLoop();
   });
 
@@ -48,3 +60,4 @@ function createBot() {
 }
 
 createBot();
+
