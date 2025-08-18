@@ -3,7 +3,7 @@ const http = require("http")
 
 // === SETTINGS ===
 const BOT_HOST = "1deadsteal.aternos.me"
-const BOT_PORT = 45632   // ⚠️ update this if Aternos gives a new one
+const BOT_PORT = 45632     // update if Aternos gives a new one
 const BOT_NAME = "mr_trolling"
 
 // === BOT CREATION ===
@@ -12,37 +12,28 @@ function startBot() {
     host: BOT_HOST,
     port: BOT_PORT,
     username: BOT_NAME,
+    version: "1.20"   // force Minecraft 1.20
   })
 
-  bot.once("login", () => console.log("✅ Logged in, waiting for spawn..."))
   bot.once("spawn", async () => {
-    console.log("🎮 Spawned in game")
     try {
       bot.setControlState("forward", true)
-      await new Promise(r => setTimeout(r, 2000)) // walk 2s forward
+      await new Promise(r => setTimeout(r, 2000))
       bot.setControlState("forward", false)
 
       bot.setControlState("back", true)
-      await new Promise(r => setTimeout(r, 2000)) // walk back
+      await new Promise(r => setTimeout(r, 2000))
       bot.setControlState("back", false)
-
-      console.log("↔️ Movement done, idle at spawn")
-    } catch (e) {
-      console.log("⚠️ Movement error:", e.message)
-    }
+    } catch {}
   })
 
-  bot.on("end", () => {
-    console.log("🔁 Disconnected. Reconnecting in 5s...")
-    setTimeout(startBot, 5000)
-  })
-
-  bot.on("kicked", reason => console.log("⛔ Kicked:", reason))
-  bot.on("error", err => console.log("⚠️ Error:", err.message))
+  bot.on("end", () => setTimeout(startBot, 5000))
+  bot.on("kicked", () => setTimeout(startBot, 5000))
+  bot.on("error", () => {})
 }
 
 startBot()
 
 // === KEEP-ALIVE SERVER ===
 const PORT = process.env.PORT || 3000
-http.createServer((req, res) => res.end("Bot alive")).listen(PORT)
+http.createServer((req, res) => res.end("alive")).listen(PORT)
