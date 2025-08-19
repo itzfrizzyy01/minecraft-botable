@@ -10,7 +10,8 @@ function createBot() {
     host: '1deadsteal.aternos.me',
     port: 42500,
     username: 'mr_trolling',
-  });
+    version: "1.20.4" // match your server version
+});
 
   // Disable all console spam
   bot.on('message', () => {});
@@ -56,4 +57,5 @@ setInterval(() => {
     res.on('data', () => {});
   }).on('error', () => {});
 }, PING_INTERVAL);
+
 
