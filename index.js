@@ -8,7 +8,7 @@ const PING_INTERVAL = 5 * 60 * 1000; // every 5 minutes
 function createBot() {
   const bot = mineflayer.createBot({
     host: '1deadsteal.aternos.me',
-    port: 60929,
+    port: 42500,
     username: 'mr_trolling',
   });
 
@@ -56,3 +56,4 @@ setInterval(() => {
     res.on('data', () => {});
   }).on('error', () => {});
 }, PING_INTERVAL);
+
