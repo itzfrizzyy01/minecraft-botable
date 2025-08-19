@@ -5,16 +5,14 @@ const mcDataLoader = require("minecraft-data");
 
 function createBot() {
   const bot = mineflayer.createBot({
-    host: "1deadsteal.aternos.me", // your server IP
-    port: 42500,                   // your server port
-    username: "mr_trolling",       // bot username
-    version: "1.20.4"              // MC version
+    host: "1deadsteal.aternos.me",
+    port: 42500,
+    username: "mr_trolling",
+    version: "1.20.4"
   });
 
-  // Silence chat/messages
   bot.on("message", () => {});
   bot.on("chat", () => {});
-
   bot.loadPlugin(pathfinder);
 
   bot.on("spawn", () => {
@@ -22,14 +20,13 @@ function createBot() {
   });
 
   bot.on("end", () => {
-    setTimeout(createBot, 5000); // reconnect after 5s
+    setTimeout(createBot, 5000);
   });
 
-  bot.on("kicked", () => {}); // ignore kick logs
-  bot.on("error", () => {});  // ignore error logs
+  bot.on("kicked", () => {});
+  bot.on("error", () => {});
 }
 
-// Walk 2 blocks forward, then back, repeat
 function startWalkingLoop(bot) {
   const mcData = mcDataLoader(bot.version);
   const movements = new Movements(bot, mcData);
@@ -44,7 +41,7 @@ function startWalkingLoop(bot) {
       await bot.pathfinder.goto(new goals.GoalBlock(pos.x, pos.y, pos.z));
       setTimeout(loop, 1000);
     } catch {
-      setTimeout(loop, 2000); // retry if fail
+      setTimeout(loop, 2000);
     }
   }
 
@@ -52,3 +49,10 @@ function startWalkingLoop(bot) {
 }
 
 createBot();
+
+// --- Tiny web server for Render ---
+const http = require("http");
+http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Bot is running\n");
+}).listen(process.env.PORT || 3000);
