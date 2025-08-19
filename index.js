@@ -1,61 +1,54 @@
 // index.js
-const mineflayer = require('mineflayer');
-const http = require('http');
-
-// Ping self interval (to stay awake on Render)
-const PING_INTERVAL = 5 * 60 * 1000; // every 5 minutes
+const mineflayer = require("mineflayer");
+const { pathfinder, Movements, goals } = require("mineflayer-pathfinder");
+const mcDataLoader = require("minecraft-data");
 
 function createBot() {
   const bot = mineflayer.createBot({
-    host: '1deadsteal.aternos.me',
-    port: 42500,
-    username: 'mr_trolling',
-    version: "1.20.4" // match your server version
-});
-
-  // Disable all console spam
-  bot.on('message', () => {});
-  bot.on('chat', () => {});
-
-  // Infinite rejoin
-  bot.on('kicked', () => setTimeout(createBot, 5000));
-  bot.on('end', () => setTimeout(createBot, 5000));
-
-  // Movement loop
-  bot.on('spawn', () => {
-    function moveLoop() {
-      if (!bot.entity) return;
-      bot.setControlState('forward', true);
-      setTimeout(() => {
-        bot.setControlState('forward', false);
-        bot.setControlState('back', true);
-        setTimeout(() => {
-          bot.setControlState('back', false);
-          moveLoop();
-        }, 2000); // move back 2s
-      }, 2000); // move forward 2s
-    }
-    moveLoop();
+    host: "1deadsteal.aternos.me", // your server IP
+    port: 42500,                   // your server port
+    username: "mr_trolling",       // bot username
+    version: "1.20.4"              // MC version
   });
+
+  // Silence chat/messages
+  bot.on("message", () => {});
+  bot.on("chat", () => {});
+
+  bot.loadPlugin(pathfinder);
+
+  bot.on("spawn", () => {
+    startWalkingLoop(bot);
+  });
+
+  bot.on("end", () => {
+    setTimeout(createBot, 5000); // reconnect after 5s
+  });
+
+  bot.on("kicked", () => {}); // ignore kick logs
+  bot.on("error", () => {});  // ignore error logs
 }
 
-// Start bot
+// Walk 2 blocks forward, then back, repeat
+function startWalkingLoop(bot) {
+  const mcData = mcDataLoader(bot.version);
+  const movements = new Movements(bot, mcData);
+  bot.pathfinder.setMovements(movements);
+
+  const pos = bot.entity.position.clone();
+
+  async function loop() {
+    try {
+      let forward = pos.offset(2, 0, 0);
+      await bot.pathfinder.goto(new goals.GoalBlock(forward.x, forward.y, forward.z));
+      await bot.pathfinder.goto(new goals.GoalBlock(pos.x, pos.y, pos.z));
+      setTimeout(loop, 1000);
+    } catch {
+      setTimeout(loop, 2000); // retry if fail
+    }
+  }
+
+  loop();
+}
+
 createBot();
-
-// Fake HTTP server to keep Render happy
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Bot is running\n');
-}).listen(process.env.PORT || 3000, () => {
-  console.log('Server listening on port', process.env.PORT || 3000);
-});
-
-// Self-ping to stay awake
-setInterval(() => {
-  http.get(`http://localhost:${process.env.PORT || 3000}`, res => {
-    // optional: you can log or ignore
-    res.on('data', () => {});
-  }).on('error', () => {});
-}, PING_INTERVAL);
-
-
