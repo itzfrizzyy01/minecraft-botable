@@ -1,9 +1,12 @@
 {
-  "name": "mc-bot",
+  "name": "minecraft-bot",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "commonjs",
   "dependencies": {
-    "mineflayer": "^4.16.0"
+    "mineflayer": "^4.20.0",
+    "mineflayer-pathfinder": "^2.4.0",
+    "minecraft-data": "^3.68.0"
   },
   "scripts": {
     "start": "node index.js"
