@@ -6,7 +6,7 @@ const mcDataLoader = require("minecraft-data");
 function createBot() {
   const bot = mineflayer.createBot({
     host: "1deadsteal.aternos.me",
-    port: 42500,
+    port: 44112,
     username: "mr_trolling",
     version: "1.20.4"
   });
@@ -56,3 +56,4 @@ http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Bot is running\n");
 }).listen(process.env.PORT || 3000);
+
