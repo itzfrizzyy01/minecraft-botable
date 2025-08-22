@@ -3,6 +3,8 @@ const mineflayer = require("mineflayer");
 const { pathfinder, Movements, goals } = require("mineflayer-pathfinder");
 const mcDataLoader = require("minecraft-data");
 
+let firstJoin = true; // track only once
+
 function createBot() {
   const bot = mineflayer.createBot({
     host: "1deadsteal.aternos.me",
@@ -13,27 +15,19 @@ function createBot() {
 
   bot.loadPlugin(pathfinder);
 
-  let loggedIn = false;
-
-  bot.on("messagestr", (msg) => {
-    msg = msg.toLowerCase();
-
-    if (msg.includes("register")) {
-      bot.chat("/register mr_trolling mr_trolling");
-    } else if (msg.includes("login")) {
-      bot.chat("/login mr_trolling");
+  bot.on("spawn", () => {
+    if (firstJoin) {
+      setTimeout(() => bot.chat("/register mr_trolling"), 2000);
+      firstJoin = false;
+    } else {
+      setTimeout(() => bot.chat("/login mr_trolling"), 2000);
     }
 
-    if ((msg.includes("success") || msg.includes("logged in")) && !loggedIn) {
-      loggedIn = true;
-      startWalkingLoop(bot);
-    }
+    // start movement after login delay too
+    setTimeout(() => startWalkingLoop(bot), 4000);
   });
 
-  bot.on("end", () => {
-    setTimeout(createBot, 5000);
-  });
-
+  bot.on("end", () => setTimeout(createBot, 5000));
   bot.on("kicked", () => {});
   bot.on("error", () => {});
 }
