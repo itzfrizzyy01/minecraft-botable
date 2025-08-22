@@ -15,7 +15,6 @@ function createBot() {
 
   let loggedIn = false;
 
-  // Detect login/register messages
   bot.on("messagestr", (msg) => {
     msg = msg.toLowerCase();
 
@@ -25,28 +24,18 @@ function createBot() {
       bot.chat("/login mr_trolling");
     }
 
-    // After login success (server usually sends something like "Successfully logged in")
-    if (msg.includes("success") || msg.includes("logged in")) {
-      if (!loggedIn) {
-        loggedIn = true;
-        console.log("✅ Logged in, starting movement loop...");
-        startWalkingLoop(bot);
-      }
+    if ((msg.includes("success") || msg.includes("logged in")) && !loggedIn) {
+      loggedIn = true;
+      startWalkingLoop(bot);
     }
   });
 
   bot.on("end", () => {
-    console.log("Bot disconnected, retrying...");
     setTimeout(createBot, 5000);
   });
 
-  bot.on("kicked", (reason) => {
-    console.log("Kicked:", reason);
-  });
-
-  bot.on("error", (err) => {
-    console.log("Error:", err);
-  });
+  bot.on("kicked", () => {});
+  bot.on("error", () => {});
 }
 
 function startWalkingLoop(bot) {
@@ -78,4 +67,3 @@ http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Bot is running\n");
 }).listen(process.env.PORT || 3000);
-
