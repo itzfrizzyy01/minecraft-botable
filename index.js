@@ -13,6 +13,8 @@ function createBot() {
 
   bot.loadPlugin(pathfinder);
 
+  let loggedIn = false;
+
   // Detect login/register messages
   bot.on("messagestr", (msg) => {
     msg = msg.toLowerCase();
@@ -22,13 +24,19 @@ function createBot() {
     } else if (msg.includes("login")) {
       bot.chat("/login 123456");
     }
-  });
 
-  bot.on("spawn", () => {
-    startWalkingLoop(bot);
+    // After login success (server usually sends something like "Successfully logged in")
+    if (msg.includes("success") || msg.includes("logged in")) {
+      if (!loggedIn) {
+        loggedIn = true;
+        console.log("✅ Logged in, starting movement loop...");
+        startWalkingLoop(bot);
+      }
+    }
   });
 
   bot.on("end", () => {
+    console.log("Bot disconnected, retrying...");
     setTimeout(createBot, 5000);
   });
 
