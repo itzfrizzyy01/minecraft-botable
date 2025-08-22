@@ -3,6 +3,8 @@ const mineflayer = require("mineflayer");
 const { pathfinder, Movements, goals } = require("mineflayer-pathfinder");
 const mcDataLoader = require("minecraft-data");
 
+let firstJoin = true; // Track if it's the first time
+
 function createBot() {
   const bot = mineflayer.createBot({
     host: "1deadsteal.aternos.me",
@@ -15,7 +17,16 @@ function createBot() {
   bot.on("chat", () => {});
   bot.loadPlugin(pathfinder);
 
-  bot.on("spawn", () => {
+  bot.on("spawn", async () => {
+    // Handle register/login
+    if (firstJoin) {
+      bot.chat("/register 123456 123456");
+      firstJoin = false;
+    } else {
+      bot.chat("/login 123456");
+    }
+
+    // Start movement loop
     startWalkingLoop(bot);
   });
 
@@ -56,4 +67,3 @@ http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Bot is running\n");
 }).listen(process.env.PORT || 3000);
-
