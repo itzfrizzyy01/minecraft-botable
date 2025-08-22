@@ -4,6 +4,7 @@ const { pathfinder, Movements, goals } = require("mineflayer-pathfinder");
 const mcDataLoader = require("minecraft-data");
 
 let firstJoin = true; // track only once
+const PASSWORD = "2211133445"; // your AuthMe password
 
 function createBot() {
   const bot = mineflayer.createBot({
@@ -17,10 +18,10 @@ function createBot() {
 
   bot.on("spawn", () => {
     if (firstJoin) {
-      setTimeout(() => bot.chat("/register mr_trolling"), 2000);
+      setTimeout(() => bot.chat(`/register ${PASSWORD} ${PASSWORD}`), 2000);
       firstJoin = false;
     } else {
-      setTimeout(() => bot.chat("/login mr_trolling"), 2000);
+      setTimeout(() => bot.chat(`/login ${PASSWORD}`), 2000);
     }
 
     // start movement after login delay too
