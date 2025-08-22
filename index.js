@@ -20,9 +20,9 @@ function createBot() {
     msg = msg.toLowerCase();
 
     if (msg.includes("register")) {
-      bot.chat("/register 123456 123456");
+      bot.chat("/register mr_trolling mr_trolling");
     } else if (msg.includes("login")) {
-      bot.chat("/login 123456");
+      bot.chat("/login mr_trolling");
     }
 
     // After login success (server usually sends something like "Successfully logged in")
@@ -78,3 +78,4 @@ http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Bot is running\n");
 }).listen(process.env.PORT || 3000);
+
