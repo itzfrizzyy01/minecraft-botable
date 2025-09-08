@@ -11,7 +11,7 @@ function createBot() {
     host: "1deadsteal.play.hosting",
     port: 25565,
     username: "mr_trolling",
-    version: "1.20.4"
+    version: "1.21"
   });
 
   bot.loadPlugin(pathfinder);
@@ -62,4 +62,5 @@ http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Bot is running\n");
 }).listen(process.env.PORT || 3000);
+
 
