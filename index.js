@@ -8,8 +8,8 @@ const PASSWORD = "2211133445"; // your AuthMe password
 
 function createBot() {
   const bot = mineflayer.createBot({
-    host: "smdgem.minefort.com",
-    port: 19132,
+    host: "1deadsteal.aternos.me",
+    port: 44112,
     username: "mr_trolling",
     version: "1.21"
   });
@@ -62,6 +62,7 @@ http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Bot is running\n");
 }).listen(process.env.PORT || 3000);
+
 
 
 
