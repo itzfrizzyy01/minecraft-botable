@@ -9,7 +9,7 @@ const PASSWORD = "221103445"; // your AuthMe password
 function createBot() {
   const bot = mineflayer.createBot({
     host: "soulstealsmp.mcsh.io",
-    port: 10254,
+    port: 25565,
     username: "mr_trollingYT",
     version: "1.21.4"
   });
