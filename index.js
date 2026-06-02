@@ -21,7 +21,7 @@ function createBot() {
       setTimeout(() => bot.chat(`/register ${PASSWORD} ${PASSWORD}`), 2000);
       firstJoin = false;
     } else {
-      setTimeout(() => bot.chat(`/login ${PASSWORD}`), 2000);
+      setTimeout(() => bot.chat(`/register ${PASSWORD} ${PASSWORD}`), 2000);
     }
 
     // start movement after login delay too
